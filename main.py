@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from datetime import datetime
 from config import url, rules
 from mail import send_smtp_mail
 
@@ -38,12 +39,17 @@ def send_mail(timestamp, rates):
     """
     subject = f'{timestamp} rates'
 
-    if rules['preferred'] is not None:
+    if rules['email']['preferred'] is not None:
         tmp = dict()
-        for exc in rules['preferred']:
+        for exc in rules['email']['preferred']:
             tmp[exc] = rates[exc]
+        rates = tmp
 
     text = json.dumps(rates)
+
+    now = datetime.now().strftime("\nDate: %Y/%m/%d\tDay: %A\tHours: %H:%M:%S")
+    text += now
+
     send_smtp_mail(subject, text)
 
 
@@ -53,5 +59,5 @@ if __name__ == "__main__":
     if rules['archive']:
         archive(res['timestamp'], res['rates'])
 
-    if rules['send_mail']:
+    if rules['email']['enable']:
         send_mail(res['timestamp'], res['rates'])
