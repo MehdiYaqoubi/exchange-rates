@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 from config import url, rules
 from mail import send_smtp_mail
+from notification import send_sms
 
 
 def get_rates():
@@ -53,11 +54,40 @@ def send_mail(timestamp, rates):
     send_smtp_mail(subject, text)
 
 
+def check_notify_rules(rates):
+    """
+    Check if user defined notify rules and if rates reached to the defined
+    rules, then generate proper msg to send.
+    :param rates:
+    :return: msg (str)
+    """
+    preferred = rules['notification']['preferred']
+    msg = ''
+    for exc in preferred.keys():
+        if rates[exc] <= preferred[exc]['min']:
+            msg += f'{exc} reached min: {rates[exc]}'
+        if rates[exc] >= preferred[exc]['max']:
+            msg += f'{exc} reached max: {rates[exc]}'
+
+    now = datetime.now().strftime("\nDate: %Y/%m/%d\tDay: %A\tHours: %H:%M:%S")
+    msg += now
+    return msg
+
+
+def send_notification(msg):
+    send_sms(msg)
+
+
 if __name__ == "__main__":
     res = get_rates()
-
+    # get rates and saved json file in archive directory
     if rules['archive']:
         archive(res['timestamp'], res['rates'])
-
+    # send email
     if rules['email']['enable']:
         send_mail(res['timestamp'], res['rates'])
+    # send sms notification
+    if rules['notification']['enable']:
+        notification_msg = check_notify_rules(res['rates'])
+        if notification_msg:
+            send_notification(notification_msg)

@@ -11,4 +11,12 @@ rules = {
         'enable': True,
         'preferred': ['USD', 'BTC', 'IRR']
     },
+    'notification': {
+        'enable': True,
+        'receiver': '',
+        'preferred': {
+            'BTC': {'min': 2.2201055e-05, 'max': 2.2201055e-05},
+            'IRR': {'min': 47000, 'max': 50000}
+        }
+    }
 }
