@@ -3,6 +3,7 @@ import json
 import requests
 
 from datetime import datetime
+from khayyam import JalaliDatetime
 from config import url, rules
 from mail import send_smtp_mail
 from notification import send_sms
@@ -48,7 +49,7 @@ def send_mail(timestamp, rates):
 
     text = json.dumps(rates)
 
-    now = datetime.now().strftime("\nDate: %Y/%m/%d\tDay: %A\tHours: %H:%M:%S")
+    now = JalaliDatetime(datetime.now()).strftime('\n%Y/%m/%d %A %H:%M:%S')
     text += now
 
     send_smtp_mail(subject, text)
@@ -69,12 +70,12 @@ def check_notify_rules(rates):
         if rates[exc] >= preferred[exc]['max']:
             msg += f'{exc} reached max: {rates[exc]}'
 
-    now = datetime.now().strftime("\nDate: %Y/%m/%d\tDay: %A\tHours: %H:%M:%S")
-    msg += now
     return msg
 
 
 def send_notification(msg):
+    now = JalaliDatetime(datetime.now()).strftime('\n%Y/%m/%d %A %H:%M:%S')
+    msg += now
     send_sms(msg)
 
 

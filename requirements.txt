@@ -2,5 +2,6 @@ certifi==2021.10.8
 charset-normalizer==2.0.9
 idna==3.3
 kavenegar==1.1.2
+Khayyam==3.0.17
 requests==2.26.0
 urllib3==1.26.7
